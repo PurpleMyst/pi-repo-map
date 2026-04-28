@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "tree-sitter-wasms": "^0.1.13",
+    "typebox": "^1.1.34",
     "web-tree-sitter": "^0.25.10"
   },
   "devDependencies": {

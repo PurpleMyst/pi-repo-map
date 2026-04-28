@@ -2,6 +2,7 @@
 // Copyright (c) 2026 popododo0720
 
 import type { ExtensionAPI, ExtensionContext } from "@mariozechner/pi-coding-agent";
+import { Type } from 'typebox';
 import * as fs from 'fs/promises';
 import * as os from 'os';
 import * as path from 'path';
@@ -9,7 +10,7 @@ import * as path from 'path';
 import { loadConfig, type RepoMapConfig } from './src/config';
 import { collectFiles } from './src/collector';
 import { processGraph } from './src/graph';
-import { renderRepoMap, injectRepoMap } from './src/renderer';
+import { renderRepoMap, injectRepoMap, renderSymbols } from './src/renderer';
 import { type NotifyFn, reportError, reportWarning } from './src/errorReporter';
 import { getCachedParse, setCachedParse, type ParseResult } from './src/cache';
 import {
@@ -198,6 +199,30 @@ async function buildRepoMap(
   return repoMap;
 }
 
+async function generateSymbols(filePath: string, cwd: string, notify?: NotifyFn): Promise<string> {
+  const absolutePath = path.isAbsolute(filePath) ? filePath : path.resolve(cwd, filePath);
+  const stat = await fs.stat(absolutePath);
+  if (stat.isDirectory()) {
+    throw new Error(`Path is a directory: ${filePath}`);
+  }
+
+  const content = await fs.readFile(absolutePath, 'utf-8');
+  const { initTreeSitter, parseFile } = await import('./src/parser');
+  await initTreeSitter(notify);
+
+  const cached = getCachedParse(content);
+  const result = cached ?? await parseFile(absolutePath, content, notify);
+  if (!cached) {
+    setCachedParse(content, result);
+  }
+
+  return renderSymbols(result.symbols);
+}
+
+const symbolsToolParameters = Type.Object({
+  path: Type.String({ description: 'Path to the file to inspect, relative to the current working directory or absolute' }),
+});
+
 export default function (pi: ExtensionAPI) {
   // Inject repo map into system prompt
   pi.on("before_agent_start", async (event, ctx) => {
@@ -262,6 +287,36 @@ export default function (pi: ExtensionAPI) {
       }
       return;
     }
+  });
+
+  pi.registerTool({
+    name: "symbols",
+    label: "Symbols",
+    description: "Read only the symbols in a file, formatted like they appear in the repo map",
+    promptSnippet: "symbols: Read only the symbols in a file, formatted like they appear in the repo map",
+    promptGuidelines: [
+      "Use symbols when you need a quick structural overview of a file without reading its full contents.",
+    ],
+    parameters: symbolsToolParameters,
+    async execute(_toolCallId, params, _signal, _onUpdate, ctx) {
+      try {
+        const notify: NotifyFn | undefined = ctx.hasUI
+          ? (message, type) => ctx.ui.notify(message, type)
+          : undefined;
+        const symbols = await generateSymbols(params.path, ctx.cwd, notify);
+        return {
+          content: [{ type: "text", text: symbols || '(no symbols found)' }],
+          details: { path: params.path },
+        };
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        return {
+          content: [{ type: "text", text: message }],
+          details: { path: params.path },
+          isError: true,
+        };
+      }
+    },
   });
 
   pi.registerCommand("repo-map", {

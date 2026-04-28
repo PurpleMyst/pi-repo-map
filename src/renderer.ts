@@ -16,7 +16,7 @@ interface ParseSymbol {
 
 const ESTIMATED_TOKEN_OVERHEAD = 50; // Headers, newlines, etc.
 
-function flattenSymbolLines(symbols: ParseSymbol[], depth = 0): string[] {
+export function flattenSymbolLines(symbols: ParseSymbol[], depth = 0): string[] {
   const lines: string[] = [];
 
   for (const symbol of symbols) {
@@ -29,6 +29,10 @@ function flattenSymbolLines(symbols: ParseSymbol[], depth = 0): string[] {
   }
 
   return lines;
+}
+
+export function renderSymbols(symbols: ParseSymbol[]): string {
+  return flattenSymbolLines(symbols).join('\n').trim();
 }
 
 export function renderRepoMap(

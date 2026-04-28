@@ -31,6 +31,7 @@ describe('/repo-map command', () => {
         on: vi.fn(),
         registerCommand,
         registerFlag: vi.fn(),
+        registerTool: vi.fn(),
         getFlag: vi.fn().mockReturnValue(false),
       } as any;
 
