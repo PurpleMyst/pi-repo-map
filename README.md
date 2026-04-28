@@ -1,14 +1,17 @@
 # Repo Map Extension
 
-A Pi extension that automatically analyzes your project structure using tree-sitter and injects a "repo map" into the system prompt.
+A Pi extension that analyzes the current project with tree-sitter and injects a compact "repo map" into the agent system prompt.
 
 ## Features
 
-- **Tree-sitter parsing** for accurate symbol extraction
-- **PageRank-based file ranking** - important files appear first
-- **Multi-language support**: TypeScript, JavaScript, Python, Go, Rust, Java, C/C++, C#, Ruby, Swift, Kotlin, Dart, Lua, Zig, Elixir, Scala, PHP, Bash, Vue, Svelte
-- **Automatic caching** with 30-second TTL
+- **Automatic repo map injection** before an agent starts, unless disabled by config or `--no-repo-map`
+- **Tree-sitter-backed symbol extraction** for fully supported languages
+- **Import-aware PageRank file ranking** for languages with import extraction
+- **Compact rendering** within a configurable token budget
+- **Automatic caching** with a 30-second repo-map cache plus content-based parse caching
+- **Progress UI** while collecting, parsing, graphing, and rendering when Pi UI support is available
 - **Configurable** via `.pi/repo-map.json`
+- **Single-file `symbols` tool** for quick symbol outlines
 
 ## Installation
 
@@ -35,24 +38,28 @@ Create `.pi/repo-map.json` in your project root:
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| `enabled` | `true` | Enable/disable repo map injection |
-| `tokenBudget` | `2048` | Max tokens for the repo map output |
-| `maxFiles` | `500` | Maximum files to analyze |
-| `excludedDirs` | (see below) | Additional directories to skip |
+| `enabled` | `true` | Enable/disable repo map injection and the `/repo-map` command for the project |
+| `tokenBudget` | `2048` | Approximate max tokens for rendered repo map output |
+| `maxFiles` | `500` | Maximum supported source files to collect and analyze |
+| `excludedDirs` | (see below) | Additional directory names to skip; user entries are added to defaults |
 
 Default excluded directories:
 - `node_modules`, `.git`, `dist`, `build`, `out`, `.next`, `.nuxt`
 - `__pycache__`, `.venv`, `venv`, `vendor`, `.pi`, `.cache`
 - `coverage`, `.turbo`, `target`, `bin`, `obj`, `.idea`, `.vscode`
 
+Files larger than 100KB are skipped.
+
 ## Usage
 
 ### Automatic Injection
 
-The repo map is automatically injected into the system prompt when:
-- A new session starts
-- The current project directory changes
-- The 30-second cache expires
+The repo map is automatically injected into the system prompt when an agent starts, unless:
+- `--no-repo-map` is set
+- `.pi/repo-map.json` has `"enabled": false`
+- Pi is running in the user's home directory
+
+A generated map is reused for 30 seconds when the current working directory is unchanged.
 
 ### Commands
 
@@ -66,11 +73,25 @@ The repo map is automatically injected into the system prompt when:
 |------|-------------|
 | `symbols` | Read a compact symbol outline for a single file |
 
+For files/languages without symbol extraction, the tool returns `(no symbols found)`.
+
 ### Flags
 
 | Flag | Description |
 |------|-------------|
 | `--no-repo-map` | Disable repo map injection for the current session |
+
+## Language Support
+
+"Supported" means the file extension is collected by the repo-map scanner. It does **not** mean every language has full symbol extraction, import extraction, or dependency ranking support.
+
+| Level | Languages/extensions | Behavior |
+|-------|----------------------|----------|
+| Fully supported | TypeScript (`.ts`), TSX (`.tsx`), JavaScript (`.js`, `.jsx`, `.mjs`, `.cjs`), Python (`.py`), Rust (`.rs`), Dart (`.dart`) | Parsed with tree-sitter; symbols and imports are extracted; imports can contribute to dependency ranking |
+| Symbols only | Lua (`.lua`) | Parsed with tree-sitter and symbols are extracted, but imports are not extracted |
+| Collected only | Go (`.go`), Java (`.java`), C/C++ (`.c`, `.cpp`, `.h`, `.hpp`), C# (`.cs`), Ruby (`.rb`), Swift (`.swift`), Kotlin (`.kt`, `.kts`), Zig (`.zig`), Elixir (`.ex`, `.exs`), Scala (`.scala`), PHP (`.php`), shell (`.sh`, `.bash`, `.zsh`), Vue (`.vue`), Svelte (`.svelte`) | Files can appear in the repo map, but no tree-sitter parser, symbols, or imports are currently extracted |
+
+If a parser WASM is unavailable or tree-sitter fails on a file, that file is kept with an empty symbol/import result and a warning may be reported.
 
 ## Output Format
 
@@ -79,23 +100,25 @@ The repo map is automatically injected into the system prompt when:
 
 <project_structure>
 src/main.ts
-│ function main
-│ class App
-│ method initialize
+│ function main (line 1)
+│ class App (line 5)
+│   method initialize (line 6)
 
 src/utils/helper.ts
-│ function calculate
-│ function format
+│ function calculate (line 1)
+│ function format (line 8)
 </project_structure>
 ```
 
+Each file is rendered as a normalized relative path followed by up to 20 symbol lines. Extra symbols are summarized with `│ ... and N more`.
+
 ## How It Works
 
-1. **File Discovery**: Walks the project directory, collecting supported source files
-2. **Parsing**: Uses tree-sitter to extract symbols (functions, classes, etc.) and imports
-3. **Graph Construction**: Builds a dependency graph from imports
-4. **PageRank**: Ranks files by importance (files imported by many others rank higher)
-5. **Rendering**: Outputs the repo map within the token budget, prioritizing important files
+1. **File discovery**: Recursively walks the project directory, collecting supported source files up to `maxFiles`, skipping excluded directories and files over 100KB
+2. **Parsing**: Loads tree-sitter parsers where available and extracts symbols/imports for languages that implement extractors
+3. **Graph construction**: Builds a dependency graph from extracted imports that resolve to collected files
+4. **PageRank**: Ranks files by importance so files imported by others tend to appear earlier
+5. **Rendering**: Outputs files and symbols within the token budget, then injects the map into the prompt
 
 ## Attribution
 
