@@ -12,15 +12,13 @@ A Pi extension that automatically analyzes your project structure using tree-sit
 
 ## Installation
 
-Clone this repository into Pi's extensions directory and install dependencies:
+Install from GitHub with Pi:
 
 ```sh
-git clone <repo-url> ~/.pi/agent/extensions/repo-map
-cd ~/.pi/agent/extensions/repo-map
-npm install
+pi install git:github.com/PurpleMyst/pi-repo-map
 ```
 
-Pi loads the extension from the `pi.extensions` entry in `package.json` on startup.
+Restart Pi after installation if it is already running. Pi loads the extension from the `pi.extensions` entry in `package.json` on startup.
 
 ## Configuration
 
@@ -60,7 +58,13 @@ The repo map is automatically injected into the system prompt when:
 
 | Command | Description |
 |---------|-------------|
-| `/repo-map` | Clear the cache and regenerate the repo map |
+| `/repo-map` | Generate and print the current repo map |
+
+### Tools
+
+| Tool | Description |
+|------|-------------|
+| `symbols` | Read a compact symbol outline for a single file |
 
 ### Flags
 
