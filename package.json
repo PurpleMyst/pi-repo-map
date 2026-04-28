@@ -1,0 +1,25 @@
+{
+  "name": "pi-repo-map",
+  "version": "1.0.0",
+  "description": "Tree-sitter based project structure for Pi",
+  "license": "ISC",
+  "packageManager": "npm@11.4.2",
+  "pi": {
+    "extensions": [
+      "./index.ts"
+    ]
+  },
+  "scripts": {
+    "test": "vitest",
+    "test:run": "vitest run",
+    "verify": "vitest run"
+  },
+  "dependencies": {
+    "tree-sitter-wasms": "^0.1.13",
+    "web-tree-sitter": "^0.25.10"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vitest": "^3.0.0"
+  }
+}

@@ -1,0 +1,124 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Rust symbol extraction > parses generics.rs 1`] = `
+{
+  "imports": [],
+  "symbols": [
+    {
+      "line": 1,
+      "name": "process",
+      "type": "function",
+    },
+    {
+      "line": 5,
+      "name": "Config",
+      "type": "struct",
+    },
+    {
+      "line": 9,
+      "name": "Result",
+      "type": "enum",
+    },
+  ],
+}
+`;
+
+exports[`Rust symbol extraction > parses impl_trait.rs 1`] = `
+{
+  "imports": [],
+  "symbols": [
+    {
+      "line": 1,
+      "name": "Display",
+      "type": "trait",
+    },
+    {
+      "children": [
+        {
+          "line": 6,
+          "name": "format",
+          "type": "method",
+        },
+      ],
+      "line": 5,
+      "name": "Display for User",
+      "type": "impl",
+    },
+    {
+      "children": [
+        {
+          "line": 12,
+          "name": "print",
+          "type": "method",
+        },
+      ],
+      "line": 11,
+      "name": "Printable for T",
+      "type": "impl",
+    },
+  ],
+}
+`;
+
+exports[`Rust symbol extraction > parses rooted_tree.rs 1`] = `
+{
+  "imports": [
+    "std::collections::HashMap",
+    "std::path::Path",
+    "std::fs",
+    "std::path::PathBuf",
+    "anyhow::Result",
+    "anyhow::anyhow",
+    "anyhow::bail",
+    "gix::objs::Blob",
+    "gix::objs::Object",
+    "gix::objs::Tree",
+    "gix::objs::WriteTo",
+    "gix::objs::compute_hash",
+    "gix::objs::tree::EntryKind",
+    "walkdir::WalkDir",
+  ],
+  "symbols": [
+    {
+      "line": 10,
+      "name": "RootedTree",
+      "type": "struct",
+    },
+    {
+      "children": [
+        {
+          "line": 17,
+          "name": "capture",
+          "type": "method",
+        },
+      ],
+      "line": 16,
+      "name": "RootedTree",
+      "type": "impl",
+    },
+  ],
+}
+`;
+
+exports[`Rust symbol extraction > parses simple.rs 1`] = `
+{
+  "imports": [],
+  "symbols": [
+    {
+      "line": 1,
+      "name": "User",
+      "type": "struct",
+    },
+    {
+      "line": 5,
+      "name": "greet",
+      "type": "function",
+    },
+    {
+      "line": 9,
+      "name": "Status",
+      "type": "enum",
+    },
+  ],
+}
+`;

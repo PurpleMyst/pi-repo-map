@@ -1,0 +1,308 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`supported language parsing > parses impl_trait.rs 1`] = `
+{
+  "imports": [],
+  "symbols": [
+    {
+      "line": 1,
+      "name": "Display",
+      "type": "trait",
+    },
+    {
+      "children": [
+        {
+          "line": 6,
+          "name": "format",
+          "type": "method",
+        },
+      ],
+      "line": 5,
+      "name": "Display for User",
+      "type": "impl",
+    },
+    {
+      "children": [
+        {
+          "line": 12,
+          "name": "print",
+          "type": "method",
+        },
+      ],
+      "line": 11,
+      "name": "Printable for T",
+      "type": "impl",
+    },
+  ],
+}
+`;
+
+exports[`supported language parsing > parses imports.dart 1`] = `
+{
+  "imports": [
+    "./helper.dart",
+    "src/widget.dart",
+    "parts/model.dart",
+  ],
+  "symbols": [
+    {
+      "line": 5,
+      "name": "App",
+      "type": "class",
+    },
+  ],
+}
+`;
+
+exports[`supported language parsing > parses nesting.dart 1`] = `
+{
+  "imports": [
+    "../../../core/theme/alloro_theme.dart",
+    "../domain/recipe.dart",
+    "widgets/recipe_detail_formatters.dart",
+  ],
+  "symbols": [
+    {
+      "children": [
+        {
+          "line": 6,
+          "name": "RecipeDetailPage",
+          "type": "method",
+        },
+        {
+          "line": 9,
+          "name": "build",
+          "type": "method",
+        },
+        {
+          "line": 13,
+          "name": "_openRecipe",
+          "type": "method",
+        },
+      ],
+      "line": 5,
+      "name": "RecipeDetailPage",
+      "type": "class",
+    },
+    {
+      "children": [
+        {
+          "line": 17,
+          "name": "log",
+          "type": "method",
+        },
+      ],
+      "line": 16,
+      "name": "Loggable",
+      "type": "mixin",
+    },
+    {
+      "line": 20,
+      "name": "RecipeStatus",
+      "type": "enum",
+    },
+    {
+      "children": [
+        {
+          "line": 26,
+          "name": "displayTitle",
+          "type": "method",
+        },
+      ],
+      "line": 25,
+      "name": "RecipeTitle",
+      "type": "extension",
+    },
+    {
+      "line": 29,
+      "name": "loadRecipe",
+      "type": "function",
+    },
+    {
+      "line": 31,
+      "name": "defaultServings",
+      "type": "const",
+    },
+    {
+      "line": 32,
+      "name": "recipeIds",
+      "type": "const",
+    },
+  ],
+}
+`;
+
+exports[`supported language parsing > parses nesting.js 1`] = `
+{
+  "imports": [
+    "./value",
+  ],
+  "symbols": [
+    {
+      "children": [
+        {
+          "line": 4,
+          "name": "increment",
+          "type": "method",
+        },
+      ],
+      "line": 3,
+      "name": "Counter",
+      "type": "class",
+    },
+    {
+      "line": 9,
+      "name": "run",
+      "type": "function",
+    },
+  ],
+}
+`;
+
+exports[`supported language parsing > parses nesting.jsx 1`] = `
+{
+  "imports": [
+    "react",
+  ],
+  "symbols": [
+    {
+      "line": 3,
+      "name": "Card",
+      "type": "function",
+    },
+  ],
+}
+`;
+
+exports[`supported language parsing > parses nesting.lua 1`] = `
+{
+  "imports": [],
+  "symbols": [
+    {
+      "line": 1,
+      "name": "greet",
+      "type": "function",
+    },
+    {
+      "line": 5,
+      "name": "User:print",
+      "type": "function",
+    },
+  ],
+}
+`;
+
+exports[`supported language parsing > parses nesting.py 1`] = `
+{
+  "imports": [
+    "os",
+    "pathlib",
+    "pathlib.Path",
+  ],
+  "symbols": [
+    {
+      "children": [
+        {
+          "line": 5,
+          "name": "__init__",
+          "type": "method",
+        },
+        {
+          "line": 8,
+          "name": "fetch",
+          "type": "method",
+        },
+      ],
+      "line": 4,
+      "name": "Greeter",
+      "type": "class",
+    },
+    {
+      "line": 12,
+      "name": "top_level",
+      "type": "function",
+    },
+  ],
+}
+`;
+
+exports[`supported language parsing > parses nesting.ts 1`] = `
+{
+  "imports": [
+    "./helper",
+  ],
+  "symbols": [
+    {
+      "children": [
+        {
+          "line": 4,
+          "name": "constructor",
+          "type": "method",
+        },
+        {
+          "line": 6,
+          "name": "greet",
+          "type": "method",
+        },
+        {
+          "line": 10,
+          "name": "from",
+          "type": "method",
+        },
+      ],
+      "line": 3,
+      "name": "UserService",
+      "type": "class",
+    },
+    {
+      "children": [
+        {
+          "line": 16,
+          "name": "print",
+          "type": "method",
+        },
+      ],
+      "line": 15,
+      "name": "Printable",
+      "type": "interface",
+    },
+    {
+      "line": 19,
+      "name": "topLevel",
+      "type": "function",
+    },
+    {
+      "line": 23,
+      "name": "answer",
+      "type": "const",
+    },
+  ],
+}
+`;
+
+exports[`supported language parsing > parses nesting.tsx 1`] = `
+{
+  "imports": [
+    "react",
+  ],
+  "symbols": [
+    {
+      "line": 3,
+      "name": "App",
+      "type": "function",
+    },
+    {
+      "children": [
+        {
+          "line": 8,
+          "name": "render",
+          "type": "method",
+        },
+      ],
+      "line": 7,
+      "name": "Button",
+      "type": "class",
+    },
+  ],
+}
+`;
