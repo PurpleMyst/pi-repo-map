@@ -21,7 +21,7 @@ export function flattenSymbolLines(symbols: ParseSymbol[], depth = 0): string[] 
 
   for (const symbol of symbols) {
     const indent = '  '.repeat(depth);
-    lines.push(`│ ${indent}${symbol.type} ${symbol.name}`);
+    lines.push(`│ ${indent}${symbol.type} ${symbol.name} (line ${symbol.line})`);
 
     if (symbol.children?.length) {
       lines.push(...flattenSymbolLines(symbol.children, depth + 1));

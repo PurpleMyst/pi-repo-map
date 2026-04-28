@@ -22,8 +22,8 @@ describe('renderRepoMap', () => {
     const output = renderRepoMap(rankedFiles, symbolsMap, 10_000);
 
     expect(output).toContain('a.ts');
-    expect(output).toContain('│ class Greeter');
-    expect(output).toContain('│   method hello');
+    expect(output).toContain('│ class Greeter (line 1)');
+    expect(output).toContain('│   method hello (line 2)');
   });
 });
 
@@ -40,6 +40,6 @@ describe('renderSymbols', () => {
       },
     ]);
 
-    expect(output).toBe('│ class Greeter\n│   method hello');
+    expect(output).toBe('│ class Greeter (line 1)\n│   method hello (line 2)');
   });
 });
