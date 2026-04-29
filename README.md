@@ -122,7 +122,7 @@ Each file is rendered as a normalized relative path followed by up to 20 symbol 
 
 ## Attribution
 
-Based on tree-sitter parsing logic from [workflow-extension](https://github.com/popododo0720/workflow-extension).
+Based on tree-sitter parsing logic from [pi-stuff](https://github.com/popododo0720/pi-stuff).
 
 ## License
 
