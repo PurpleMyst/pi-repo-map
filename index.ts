@@ -6,6 +6,7 @@ import { Type } from 'typebox';
 import * as fs from 'fs/promises';
 import * as os from 'os';
 import * as path from 'path';
+import { Text } from "@earendil-works/pi-tui";
 
 import { loadConfig, type RepoMapConfig } from './src/config';
 import { collectFiles } from './src/collector';
@@ -319,6 +320,11 @@ export default function (pi: ExtensionAPI) {
           isError: true,
         };
       }
+    },
+
+    renderCall(args, theme, _context) {
+      const text = theme.fg("toolTitle", theme.bold("symbols ")) + theme.fg("accent", args.path);
+      return new Text(text, 0, 0);
     },
   });
 
