@@ -26,8 +26,6 @@ interface CacheEntry {
   timestamp: number;
 }
 
-const CACHE_TTL_MS = 30_000;
-
 let cache: CacheEntry | null = null;
 
 export async function generateRepoMap(
@@ -199,11 +197,15 @@ async function buildRepoMap(
   return repoMap;
 }
 
-async function generateSymbols(filePath: string, cwd: string, notify?: NotifyFn): Promise<string> {
+async function generateSymbols(filePath: string, cwd: string, notify?: NotifyFn, signal?: AbortSignal): Promise<string> {
   const absolutePath = path.isAbsolute(filePath) ? filePath : path.resolve(cwd, filePath);
   const stat = await fs.stat(absolutePath);
   if (stat.isDirectory()) {
-    throw new Error(`Path is a directory: ${filePath}`);
+    const config = await loadConfig(absolutePath);
+    if (config.enabled === false) {
+      throw new Error(`Repo map is disabled for ${filePath}`);
+    }
+    return await generateRepoMap(absolutePath, config, notify, undefined, signal);
   }
 
   const content = await fs.readFile(absolutePath, 'utf-8');
@@ -220,7 +222,7 @@ async function generateSymbols(filePath: string, cwd: string, notify?: NotifyFn)
 }
 
 const symbolsToolParameters = Type.Object({
-  path: Type.String({ description: 'Path to the file to inspect, relative to the current working directory or absolute' }),
+  path: Type.String({ description: 'Path to the file or directory to inspect, relative to the current working directory or absolute. For files, returns a symbol outline. For directories, returns an updated repository map.' }),
 });
 
 export default function (pi: ExtensionAPI) {
@@ -242,10 +244,9 @@ export default function (pi: ExtensionAPI) {
         return;
       }
 
-      const now = Date.now();
 
       // Check cache
-      if (cache && cache.cwd === ctx.cwd && now - cache.timestamp < CACHE_TTL_MS) {
+      if (cache && cache.cwd === ctx.cwd) {
         return {
           systemPrompt: event.systemPrompt + injectRepoMap(cache.map),
         };
@@ -292,18 +293,20 @@ export default function (pi: ExtensionAPI) {
   pi.registerTool({
     name: "symbols",
     label: "Symbols",
-    description: "Read only the symbols in a file, formatted like they appear in the repo map",
+    description: "Read only the symbols in a file (formatted like the repo map), or pass a directory path to generate an updated repository map",
     promptSnippet: "symbols: Read only the symbols in a file, formatted like they appear in the repo map",
     promptGuidelines: [
       "Use symbols when you need a quick structural overview of a file without reading its full contents.",
+      "The repository map is a snapshot from session start and may be stale. Use symbols with a directory path (e.g., the project root) to generate an updated map when you suspect it is out of date (for example, after creating, moving, or renaming files).",
     ],
+
     parameters: symbolsToolParameters,
     async execute(_toolCallId, params, _signal, _onUpdate, ctx) {
       try {
         const notify: NotifyFn | undefined = ctx.hasUI
           ? (message, type) => ctx.ui.notify(message, type)
           : undefined;
-        const symbols = await generateSymbols(params.path, ctx.cwd, notify);
+        const symbols = await generateSymbols(params.path, ctx.cwd, notify, ctx.signal ?? undefined);
         return {
           content: [{ type: "text", text: symbols || '(no symbols found)' }],
           details: { path: params.path },
