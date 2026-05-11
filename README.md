@@ -25,7 +25,7 @@ Restart Pi after installation if it is already running. Pi loads the extension f
 
 ## Configuration
 
-Create `.pi/repo-map.json` in your project root:
+Create `.pi/repo-map.json` in your project root. All fields are optional; omitted fields use the defaults shown here:
 
 ```json
 {
@@ -41,14 +41,14 @@ Create `.pi/repo-map.json` in your project root:
 | `enabled` | `true` | Enable/disable repo map injection and the `/repo-map` command for the project |
 | `tokenBudget` | `2048` | Approximate max tokens for rendered repo map output |
 | `maxFiles` | `500` | Maximum supported source files to collect and analyze |
-| `excludedDirs` | (see below) | Additional directory names to skip; user entries are added to defaults |
+| `excludedDirs` | (see below) | Additional directory names to skip; user entries are appended to the defaults rather than replacing them |
 
 Default excluded directories:
 - `node_modules`, `.git`, `dist`, `build`, `out`, `.next`, `.nuxt`
 - `__pycache__`, `.venv`, `venv`, `vendor`, `.pi`, `.cache`
 - `coverage`, `.turbo`, `target`, `bin`, `obj`, `.idea`, `.vscode`
 
-Files larger than 100KB are skipped.
+Config merging uses shallow scalar overrides (`enabled`, `tokenBudget`, `maxFiles`) and additive `excludedDirs` merging, so default excluded directories always remain excluded. Files larger than 100KB are skipped.
 
 ## Usage
 

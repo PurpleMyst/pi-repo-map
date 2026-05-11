@@ -3,6 +3,7 @@
 
 import * as path from 'path';
 import * as fs from 'fs';
+import type { Language } from 'web-tree-sitter';
 import { errorSignature, type NotifyFn, reportError, reportWarning } from './errorReporter';
 import { getLanguageByFilePath, type LanguageId, type SymbolNode } from './languages';
 
@@ -13,20 +14,13 @@ export interface ParseResult {
   imports: string[];
 }
 
-interface TreeSitterTypes {
-  Parser: typeof import('web-tree-sitter').Parser;
-  Language: typeof import('web-tree-sitter').Language;
-  Node: import('web-tree-sitter').Node;
-  Point: import('web-tree-sitter').Point;
-}
-
-let tsTypes: TreeSitterTypes | null = null;
-let languageCache: Record<string, import('web-tree-sitter').Language> = {};
+let treeSitter: typeof import('web-tree-sitter') | null = null;
+let languageCache: Record<string, Language> = {};
 let initPromise: Promise<void> | null = null;
 let wasmDir: string = '';
 
 export async function initTreeSitter(notify?: NotifyFn): Promise<void> {
-  if (tsTypes) return;
+  if (treeSitter) return;
   if (initPromise) {
     await initPromise;
     return;
@@ -34,28 +28,16 @@ export async function initTreeSitter(notify?: NotifyFn): Promise<void> {
 
   initPromise = (async () => {
     try {
-      const ts = await import('web-tree-sitter');
-      tsTypes = {
-        Parser: ts.Parser,
-        Language: ts.Language,
-        Node: ts.Node,
-        Point: ts.Point,
-      };
+      treeSitter = await import('web-tree-sitter');
+      await treeSitter.Parser.init();
 
-      await ts.Parser.init();
-
-      try {
-        const pkgPath = require.resolve('tree-sitter-wasms/package.json');
-        wasmDir = path.dirname(pkgPath) + '/out';
-      } catch {
-        wasmDir = path.join(__dirname, '../../node_modules/tree-sitter-wasms/out');
-      }
+      wasmDir = path.join(path.dirname(require.resolve('tree-sitter-wasms/package.json')), 'out');
     } catch (err) {
       reportError('Failed to initialize tree-sitter', err, {
         onceKey: 'tree-sitter-init-failed',
         notify,
       });
-      tsTypes = null;
+      treeSitter = null;
     }
   })();
 
@@ -63,10 +45,11 @@ export async function initTreeSitter(notify?: NotifyFn): Promise<void> {
 }
 
 async function getLanguage(
-  languageConfig: { id: LanguageId; wasmFile?: string }
-): Promise<import('web-tree-sitter').Language | null> {
-  if (!tsTypes) await initTreeSitter();
-  if (!tsTypes || !languageConfig.wasmFile) return null;
+  languageConfig: { id: LanguageId; wasmFile?: string },
+  notify?: NotifyFn
+): Promise<Language | null> {
+  if (!treeSitter) await initTreeSitter(notify);
+  if (!treeSitter || !languageConfig.wasmFile) return null;
 
   if (languageCache[languageConfig.id]) return languageCache[languageConfig.id];
 
@@ -74,7 +57,7 @@ async function getLanguage(
   if (!fs.existsSync(wasmPath)) return null;
 
   try {
-    const lang = await tsTypes.Language.load(wasmPath);
+    const lang = await treeSitter.Language.load(wasmPath);
     languageCache[languageConfig.id] = lang;
     return lang;
   } catch {
@@ -93,18 +76,13 @@ export async function parseFile(
     return { symbols: [], imports: [] };
   }
 
-  if (!tsTypes) await initTreeSitter(notify);
-  if (!tsTypes) {
-    return { symbols: [], imports: [] };
-  }
-
   try {
-    const lang = await getLanguage(languageConfig);
-    if (!lang) {
+    const lang = await getLanguage(languageConfig, notify);
+    if (!treeSitter || !lang) {
       return { symbols: [], imports: [] };
     }
 
-    const parser = new tsTypes.Parser();
+    const parser = new treeSitter.Parser();
     parser.setLanguage(lang);
 
     const tree = parser.parse(content);

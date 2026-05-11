@@ -7,27 +7,21 @@ import { SUPPORTED_EXTENSIONS } from './languages';
 
 const MAX_FILE_SIZE = 100 * 1024; // 100KB
 
-interface CollectorOptions {
-  maxFiles: number;
-  excludedDirs: string[];
-  onProgress?: (current: number) => void;
-}
-
-interface FileInfo {
+export interface FileInfo {
   path: string;
   relativePath: string;
 }
 
-async function shouldExclude(dirName: string, excludedDirs: string[]): Promise<boolean> {
-  const lower = dirName.toLowerCase();
-  return excludedDirs.some(ex => lower === ex.toLowerCase());
-}
-
 export async function collectFiles(
   rootDir: string,
-  options: CollectorOptions
+  options: {
+    maxFiles: number;
+    excludedDirs: string[];
+    onProgress?: (current: number) => void;
+  }
 ): Promise<FileInfo[]> {
   const files: FileInfo[] = [];
+
 
   async function walk(dir: string): Promise<void> {
     if (files.length >= options.maxFiles) return;
@@ -41,7 +35,8 @@ export async function collectFiles(
         const fullPath = path.join(dir, entry.name);
 
         if (entry.isDirectory()) {
-          if (await shouldExclude(entry.name, options.excludedDirs)) {
+          const lowerName = entry.name.toLowerCase();
+          if (options.excludedDirs.some(dir => lowerName === dir.toLowerCase())) {
             continue;
           }
           await walk(fullPath);

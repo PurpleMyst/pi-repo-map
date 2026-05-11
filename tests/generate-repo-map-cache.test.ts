@@ -25,7 +25,7 @@ async function loadGenerateRepoMap(parseFileMock: ReturnType<typeof vi.fn>) {
     parseFile: parseFileMock,
   }));
 
-  const { generateRepoMap } = await import('../index');
+  const { generateRepoMap } = await import('../src/generator');
   return generateRepoMap;
 }
 

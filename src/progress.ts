@@ -6,7 +6,8 @@
  * Uses pi's setWidget API to show real-time progress below the editor.
  */
 
-import type { Theme } from "@mariozechner/pi-coding-agent";
+import type { Theme } from "@earendil-works/pi-coding-agent";
+import type { Component, TUI } from "@earendil-works/pi-tui";
 
 export type ProgressPhase =
   | "collecting"
@@ -24,6 +25,9 @@ export interface ProgressState {
 }
 
 export type ProgressCallback = (state: ProgressState) => void;
+
+type ProgressWidgetFactory = (tui: TUI, theme: Theme) => Component;
+export type SetProgressWidget = (id: string, content: ProgressWidgetFactory | undefined) => void;
 
 const PHASE_LABELS: Record<ProgressPhase, string> = {
   collecting: "Discovering files",
@@ -71,10 +75,7 @@ export function renderProgressLine(state: ProgressState, theme: Theme): string[]
  * Create a progress callback that updates a widget via setWidget.
  */
 export function createWidgetProgressCallback(
-  setWidget: (
-    id: string,
-    content: ((tui: unknown, theme: Theme) => { render: () => string[]; invalidate: () => void }) | undefined
-  ) => void,
+  setWidget: SetProgressWidget,
   widgetId: string = "repo-map-progress"
 ): ProgressCallback {
   let state: ProgressState = {
@@ -87,7 +88,7 @@ export function createWidgetProgressCallback(
   return (update: Partial<ProgressState>) => {
     state = { ...state, ...update };
     setWidget(widgetId, (_tui, theme) => ({
-      render: () => renderProgressLine(state, theme),
+      render: (_width: number) => renderProgressLine(state, theme),
       invalidate: () => {},
     }));
   };
@@ -97,10 +98,7 @@ export function createWidgetProgressCallback(
  * Clear the progress widget.
  */
 export function clearProgressWidget(
-  setWidget: (
-    id: string,
-    content: ((tui: unknown, theme: Theme) => { render: () => string[]; invalidate: () => void }) | undefined
-  ) => void,
+  setWidget: SetProgressWidget,
   widgetId: string = "repo-map-progress"
 ): void {
   setWidget(widgetId, undefined);

@@ -2,6 +2,7 @@
 // Copyright (c) 2026 popododo0720
 
 import * as path from 'path';
+import type { FileInfo } from './collector';
 import { resolveImportForFile } from './languages';
 
 interface GraphNode {
@@ -15,7 +16,7 @@ type FileGraph = Map<string, GraphNode>;
 const DAMPING = 0.85;
 const ITERATIONS = 30;
 
-function getRootDir(files: { path: string; relativePath: string }[]): string {
+function getRootDir(files: FileInfo[]): string {
   const first = files[0];
   if (!first) return path.resolve('.');
 
@@ -23,7 +24,7 @@ function getRootDir(files: { path: string; relativePath: string }[]): string {
 }
 
 function buildGraph(
-  files: { path: string; relativePath: string }[],
+  files: FileInfo[],
   parseResults: Map<string, { imports: string[] }>
 ): FileGraph {
   const graph: FileGraph = new Map();
@@ -47,6 +48,8 @@ function buildGraph(
 
     const imports = new Set<string>();
     for (const importPath of result.imports) {
+      // Parsers extract language-level import specifiers, but resolving them needs
+      // the project root and collected-file set, both of which are graph concerns.
       const resolved = resolveImportForFile(importPath, filePath, rootDir, knownFiles);
       if (resolved && resolved !== filePath) {
         imports.add(resolved);
@@ -58,7 +61,7 @@ function buildGraph(
   return graph;
 }
 
-function computePageRank(graph: FileGraph): void {
+function applyPageRank(graph: FileGraph): void {
   const nodes = Array.from(graph.values());
   const n = nodes.length;
   if (n === 0) return;
@@ -100,25 +103,20 @@ function computePageRank(graph: FileGraph): void {
   }
 }
 
-export interface RankedFile {
-  path: string;
-  relativePath: string;
-  pagerank: number;
-}
+export type RankedFile = FileInfo & { pagerank: number };
 
 export function processGraph(
-  files: { path: string; relativePath: string }[],
+  files: FileInfo[],
   parseResults: Map<string, { imports: string[] }>
 ): RankedFile[] {
   const graph = buildGraph(files, parseResults);
-  computePageRank(graph);
+  applyPageRank(graph);
 
   return files.map(file => {
     const filePath = path.resolve(file.path);
     const node = graph.get(filePath);
     return {
-      path: file.path,
-      relativePath: file.relativePath,
+      ...file,
       pagerank: node?.pagerank ?? 0,
     };
   }).sort((a, b) => b.pagerank - a.pagerank);

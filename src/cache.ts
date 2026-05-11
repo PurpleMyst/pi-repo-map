@@ -1,7 +1,7 @@
 // Based on workflow-extension (ISC License)
 // Copyright (c) 2026 popododo0720
 
-import * as crypto from 'crypto';
+import { createHash } from 'crypto';
 
 export interface ParseSymbol {
   type: string;
@@ -21,7 +21,7 @@ type Cache = Map<string, ParseResult>;
 const parseCache: Cache = new Map();
 
 function contentHash(content: string): string {
-  return crypto.createHash('sha256').update(content, 'utf-8').digest('hex');
+  return createHash('sha256').update(content, 'utf-8').digest('hex');
 }
 
 export function getCachedParse(content: string): ParseResult | null {

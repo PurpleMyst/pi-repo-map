@@ -46,6 +46,8 @@ export async function loadConfig(cwd: string): Promise<RepoMapConfig> {
     const content = await fs.readFile(configPath, 'utf-8');
     const userConfig = JSON.parse(content);
 
+    // Scalar options override defaults. excludedDirs is additive so projects can
+    // add local exclusions without accidentally re-including default skip dirs.
     return {
       ...DEFAULT_CONFIG,
       ...userConfig,
