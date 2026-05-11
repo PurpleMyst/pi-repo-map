@@ -1,27 +1,48 @@
 import type { LanguageConfig } from './types';
 import {
   resolveDartImport,
+} from './dart';
+import {
   resolveJSImport,
+} from './js';
+import {
   resolvePythonImport,
+} from './python';
+import {
   resolveRustImport,
-} from './resolvers';
+} from './rust';
 import {
   resolveDefaultImport,
   resolveUnknownImport,
 } from './utils';
 import {
   extractDartImports,
+} from './dart';
+import {
   extractJSImports,
+} from './js';
+import {
   extractPythonImports,
+} from './python';
+import {
   extractRustImports,
-} from './imports';
+} from './rust';
 import {
   extractDartSymbols,
+} from './dart';
+import {
   extractJSSymbols,
+} from './js';
+import {
   extractLuaSymbols,
+} from './lua';
+import {
   extractPythonSymbols,
+} from './python';
+import {
   extractRustSymbols,
-} from './symbols';
+} from './rust';
+
 
 export const LANGUAGE_REGISTRY: LanguageConfig[] = [
   {

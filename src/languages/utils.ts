@@ -1,3 +1,5 @@
+import type { SymbolNode, TreeSitterNode } from './types';
+
 // Based on workflow-extension (ISC License)
 // Copyright (c) 2026 popododo0720
 
@@ -69,3 +71,50 @@ const DEFAULT_RESOLVE_EXTENSIONS = [
 
 export const resolveUnknownImport = createPathImportResolver(['']);
 export const resolveDefaultImport = createPathImportResolver(DEFAULT_RESOLVE_EXTENSIONS);
+
+// ---------------------------------------------------------------------------
+// Shared symbol extraction utilities
+// ---------------------------------------------------------------------------
+
+/** Return unique items from a string array, preserving first-occurrence order. */
+export function unique(values: string[]): string[] {
+  return Array.from(new Set(values));
+}
+
+export function getDeclarationName(node: TreeSitterNode): string | null {
+  const nameField = node.childForFieldName?.('name');
+  if (nameField) {
+    return nameField.text.trim();
+  }
+
+  for (let i = 0; i < node.childCount; i++) {
+    const child = node.child(i);
+    if (!child) continue;
+
+    if (
+      child.type === 'identifier' ||
+      child.type === 'type_identifier' ||
+      child.type === 'property_identifier' ||
+      child.type === 'field_identifier'
+    ) {
+      return child.text.trim();
+    }
+  }
+
+  return null;
+}
+
+export function presentChildren(node: TreeSitterNode): TreeSitterNode[] {
+  return node.namedChildren.filter((child): child is TreeSitterNode => child !== null);
+}
+
+export function createSymbol(
+  type: string,
+  name: string,
+  node: TreeSitterNode,
+  children: SymbolNode[] = []
+): SymbolNode {
+  return children.length > 0
+    ? { type, name, line: node.startPosition.row + 1, children }
+    : { type, name, line: node.startPosition.row + 1 };
+}
