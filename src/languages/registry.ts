@@ -1,12 +1,14 @@
 import type { LanguageConfig } from './types';
 import {
   resolveDartImport,
-  resolveDefaultImport,
   resolveJSImport,
   resolvePythonImport,
   resolveRustImport,
-  resolveUnknownImport,
 } from './resolvers';
+import {
+  resolveDefaultImport,
+  resolveUnknownImport,
+} from './utils';
 import {
   extractDartImports,
   extractJSImports,
