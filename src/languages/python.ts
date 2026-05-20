@@ -91,22 +91,35 @@ export function extractPythonSymbols(
   const symbols: SymbolNode[] = [];
 
   for (const child of presentChildren(node)) {
-    if (child.type === 'class_definition') {
-      const name = getDeclarationName(child);
+    // Unwrap decorated_definition — its inner definition is a named child.
+    const def: TreeSitterNode | undefined =
+      child.type === 'decorated_definition'
+        ? child.namedChildren.find(
+            (c: TreeSitterNode) =>
+              c.type === 'function_definition' ||
+              c.type === 'async_function_definition' ||
+              c.type === 'class_definition'
+          )
+        : child;
+
+    if (!def) continue;
+
+    if (def.type === 'class_definition') {
+      const name = getDeclarationName(def);
       if (!name) continue;
 
-      const body = child.childForFieldName?.('body');
+      const body = def.childForFieldName?.('body');
       const children = body ? extractPythonSymbols(body, 'class') : [];
-      symbols.push(createSymbol('class', name, child, children));
+      symbols.push(createSymbol('class', name, def, children));
       continue;
     }
 
-    if (child.type === 'function_definition' || child.type === 'async_function_definition') {
-      const name = getDeclarationName(child);
+    if (def.type === 'function_definition' || def.type === 'async_function_definition') {
+      const name = getDeclarationName(def);
       if (!name) continue;
 
       const symbolType = context === 'class' ? 'method' : 'function';
-      symbols.push(createSymbol(symbolType, name, child));
+      symbols.push(createSymbol(symbolType, name, def));
     }
   }
 

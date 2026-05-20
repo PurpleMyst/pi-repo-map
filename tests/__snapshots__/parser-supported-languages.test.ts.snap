@@ -1,5 +1,59 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`supported language parsing > parses decorated.py 1`] = `
+{
+  "imports": [
+    "os",
+    "functools",
+    "functools.wraps",
+  ],
+  "symbols": [
+    {
+      "line": 5,
+      "name": "my_decorator",
+      "type": "function",
+    },
+    {
+      "line": 13,
+      "name": "simple_decorated",
+      "type": "function",
+    },
+    {
+      "line": 19,
+      "name": "multi_decorated",
+      "type": "function",
+    },
+    {
+      "children": [
+        {
+          "line": 25,
+          "name": "index",
+          "type": "method",
+        },
+        {
+          "line": 29,
+          "name": "async_index",
+          "type": "method",
+        },
+      ],
+      "line": 23,
+      "name": "Controller",
+      "type": "class",
+    },
+    {
+      "line": 34,
+      "name": "Config",
+      "type": "class",
+    },
+    {
+      "line": 38,
+      "name": "bare_function",
+      "type": "function",
+    },
+  ],
+}
+`;
+
 exports[`supported language parsing > parses impl_trait.rs 1`] = `
 {
   "imports": [],

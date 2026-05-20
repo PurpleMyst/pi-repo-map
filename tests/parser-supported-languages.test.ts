@@ -16,6 +16,7 @@ describe('supported language parsing', () => {
     'nesting.js',
     'nesting.jsx',
     'nesting.py',
+    'decorated.py',
     'nesting.lua',
     'impl_trait.rs',
     'imports.dart',
