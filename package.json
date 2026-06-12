@@ -3,16 +3,13 @@
   "version": "1.0.0",
   "description": "Tree-sitter based project structure for Pi",
   "license": "ISC",
-  "type": "module",
-  "packageManager": "pnpm@10.11.0",
+  "packageManager": "npm@11.4.2",
   "pi": {
     "extensions": [
-      "./dist/index.js"
+      "./index.ts"
     ]
   },
   "scripts": {
-    "build": "esbuild src/index.ts --bundle --platform=node --target=node20 --format=esm --minify --legal-comments=eof --outfile=dist/index.js --external:@earendil-works/pi-coding-agent --external:@earendil-works/pi-ai --external:@earendil-works/pi-agent-core --external:@earendil-works/pi-tui --external:typebox",
-    "build:debug": "esbuild src/index.ts --bundle --platform=node --target=node20 --format=esm --sourcemap --outfile=dist/index.js --external:@earendil-works/pi-coding-agent --external:@earendil-works/pi-ai --external:@earendil-works/pi-agent-core --external:@earendil-works/pi-tui --external:typebox",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
@@ -21,14 +18,11 @@
     "web-tree-sitter": "^0.25.10"
   },
   "devDependencies": {
-    "@types/node": "^22.15.18",
-    "esbuild": "^0.25.4",
     "typescript": "^6.0.3",
     "vitest": "^3.0.0"
   },
   "peerDependencies": {
     "@earendil-works/pi-coding-agent": ">=0.69.0",
-    "@earendil-works/pi-tui": ">=0.69.0",
     "typebox": "^1.1.34"
   }
 }

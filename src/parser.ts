@@ -3,12 +3,9 @@
 
 import * as path from 'path';
 import * as fs from 'fs';
-import { createRequire } from 'module';
 import type { Language } from 'web-tree-sitter';
 import { errorSignature, type NotifyFn, reportError, reportWarning } from './errorReporter';
 import { getLanguageByFilePath, type LanguageId, type SymbolNode } from './languages';
-
-const require = createRequire(import.meta.url);
 
 export type { SymbolNode } from './languages';
 

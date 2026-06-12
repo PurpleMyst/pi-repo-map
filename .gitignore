@@ -7,8 +7,7 @@ pnpm-debug.log*
 yarn-debug.log*
 
 # Runtime / generated output
-dist/*
-!dist/index.js
+dist/
 build/
 coverage/
 .nyc_output/
