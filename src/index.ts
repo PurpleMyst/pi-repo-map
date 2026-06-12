@@ -6,16 +6,16 @@ import { Type } from 'typebox';
 import * as os from 'os';
 import { Text } from "@earendil-works/pi-tui";
 
-import { loadConfig, type RepoMapConfig } from './src/config';
-import { type NotifyFn, reportError } from './src/errorReporter';
-import { generateRepoMap, generateSymbols } from './src/generator';
+import { loadConfig, type RepoMapConfig } from './config';
+import { type NotifyFn, reportError } from './errorReporter';
+import { generateRepoMap, generateSymbols } from './generator';
 import {
   type ProgressCallback,
   type SetProgressWidget,
   createWidgetProgressCallback,
   clearProgressWidget,
-} from './src/progress';
-import { injectRepoMap } from './src/renderer';
+} from './progress';
+import { injectRepoMap } from './renderer';
 
 interface CachedRepoMap {
   cwd: string;

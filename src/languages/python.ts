@@ -95,11 +95,11 @@ export function extractPythonSymbols(
     const def: TreeSitterNode | undefined =
       child.type === 'decorated_definition'
         ? child.namedChildren.find(
-            (c: TreeSitterNode) =>
-              c.type === 'function_definition' ||
-              c.type === 'async_function_definition' ||
-              c.type === 'class_definition'
-          )
+            (c) =>
+              c?.type === 'function_definition' ||
+              c?.type === 'async_function_definition' ||
+              c?.type === 'class_definition'
+          ) ?? undefined
         : child;
 
     if (!def) continue;
